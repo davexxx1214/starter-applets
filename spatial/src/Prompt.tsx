@@ -16,6 +16,7 @@ import { useAtom } from "jotai";
 import getStroke from "perfect-freehand";
 import {GoogleGenerativeAI} from "@google/generative-ai";
 import {
+  AnnotatedImagesAtom,
   BoundingBoxes2DAtom,
   BoundingBoxes3DAtom,
   ShareStream,
@@ -49,15 +50,29 @@ export function Prompt() {
   const [videoRef] = useAtom(VideoRefAtom);
   const [imageSrc] = useAtom(ImageSrcAtom);
   const [showCustomPrompt] = useState(false);
-  const [targetPrompt, setTargetPrompt] = useState("items");
+  const [targetPrompt, setTargetPrompt] = useState("建筑物");
   const [labelPrompt, setLabelPrompt] = useState("");
   const [showRawPrompt, setShowRawPrompt] = useState(false);
 
   const [prompts, setPrompts] = useAtom(PromptsAtom);
   const [customPrompts, setCustomPrompts] = useAtom(CustomPromptsAtom);
+  const [annotatedImages, setAnnotatedImages] = useAtom(AnnotatedImagesAtom);
 
 
   const is2d = detectType === "2D bounding boxes";
+
+  // 保存标注图片的函数
+  const saveAnnotatedImage = (imageDataUrl: string, annotations: any) => {
+    const newAnnotatedImage = {
+      id: Date.now().toString(),
+      src: imageDataUrl,
+      timestamp: Date.now(),
+      type: detectType,
+      annotations: annotations
+    };
+    
+    setAnnotatedImages((prev) => [newAnnotatedImage, ...prev]);
+  };
 
   const get2dPrompt = () =>
     `Detect ${
@@ -162,6 +177,9 @@ export function Prompt() {
       );
       setHoverEntered(false);
       setBoundingBoxes2D(formattedBoxes);
+      
+      // 保存标注图片
+      saveAnnotatedImage(activeDataURL, formattedBoxes);
     } else if (detectType === "Points") {
       const formattedPoints = parsedResponse.map(
         (point: { point: [number, number]; label: string }) => {
@@ -175,6 +193,9 @@ export function Prompt() {
         },
       );
       setPoints(formattedPoints);
+      
+      // 保存标注图片
+      saveAnnotatedImage(activeDataURL, formattedPoints);
     } else {
       const formattedBoxes = parsedResponse.map(
         (box: {
@@ -205,6 +226,9 @@ export function Prompt() {
         },
       );
       setBoundingBoxes3D(formattedBoxes);
+      
+      // 保存标注图片
+      saveAnnotatedImage(activeDataURL, formattedBoxes);
     }
   }
 

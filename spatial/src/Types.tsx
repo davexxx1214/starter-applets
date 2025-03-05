@@ -29,5 +29,18 @@ export type BoundingBox3DType = {
   label: string;
 };
 
+export type PointingType = {
+  point: {
+    x: number;
+    y: number;
+  };
+  label: string;
+};
 
-
+export type AnnotatedImageType = {
+  id: string;
+  src: string;
+  timestamp: number;
+  type: DetectTypes;
+  annotations: BoundingBox2DType[] | BoundingBox3DType[] | PointingType[];
+};

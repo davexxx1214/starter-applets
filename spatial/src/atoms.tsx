@@ -21,9 +21,9 @@ import {
   imageOptions,
   modelOptions,
 } from "./consts";
-import { BoundingBox2DType, BoundingBox3DType, DetectTypes } from "./Types";
+import { AnnotatedImageType, BoundingBox2DType, BoundingBox3DType, DetectTypes, PointingType } from "./Types";
 
-export const ImageSrcAtom = atom<string | null>(imageOptions[0]);
+export const ImageSrcAtom = atom<string | null>(null);
 
 export const ImageSentAtom = atom(false);
 
@@ -35,14 +35,6 @@ export const PromptsAtom = atom<Record<DetectTypes, string[]>>({
 export const CustomPromptsAtom = atom<Record<DetectTypes, string>>({
   ...defaultPrompts,
 });
-
-export type PointingType = {
-  point: {
-    x: number;
-    y: number;
-  };
-  label: string;
-};
 
 export const RevealOnHoverModeAtom = atom<boolean>(true);
 
@@ -85,3 +77,5 @@ export const BumpSessionAtom = atom(0);
 export const IsUploadedImageAtom = atom(false);
 
 export const ShowConfigAtom = atom(true);
+
+export const AnnotatedImagesAtom = atomWithStorage<AnnotatedImageType[]>("annotatedImages", []);

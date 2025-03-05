@@ -51,17 +51,17 @@ export const lineOptions = {
 export const defaultPromptParts = {
   "2D bounding boxes": [
     "Show me the positions of",
-    "items",
+    "建筑物",
     "as a JSON list. Do not return masks. Limit to 25 items.",
   ],
   "3D bounding boxes": [
     "Output in json. Detect the 3D bounding boxes of",
-    "items",
+    "建筑物",
     ', output no more than 10 items. Return a list where each entry contains the object name in "label" and its 3D bounding box in "box_3d".',
   ],
   Points: [
     "Point to the",
-    "items",
+    "建筑物",
     ' with no more than 10 items. The answer should follow the json format: [{"point": <point>, "label": <label1>}, ...]. The points are in [y, x] format normalized to 0-1000.'
   ],
 };
