@@ -17,7 +17,6 @@ import { TopBar } from "./TopBar.js";
 import { Content } from "./Content.js";
 import { AnnotatedImages } from "./AnnotatedImages.js";
 import { SideControls } from "./SideControls.js";
-import { Prompt } from "./Prompt.js";
 import { ExtraModeControls } from "./ExtraModeControls.js";
 import { useAtom } from "jotai";
 import {
@@ -27,7 +26,6 @@ import {
   IsUploadedImageAtom,
 } from "./atoms.js";
 import { useResetState } from "./hooks.js";
-import { DetectTypeSelector } from "./DetectTypeSelector.js";
 import { safetySettings } from "./consts.js";
 
 function App() {
@@ -51,13 +49,9 @@ function App() {
         <ExtraModeControls />
       </div>
       <div className="flex shrink-0 w-full overflow-auto py-6 px-5 gap-6 lg:items-start">
-        <div className="flex flex-col lg:flex-col gap-6 items-start border-r pr-5">
+        <div className="flex flex-col lg:flex-col gap-6 items-start">
           <AnnotatedImages />
           <SideControls />
-        </div>
-        <div className="flex flex-row gap-6 grow">
-          <DetectTypeSelector />
-          <Prompt />
         </div>
       </div>
     </div>

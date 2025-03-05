@@ -79,3 +79,6 @@ export const IsUploadedImageAtom = atom(false);
 export const ShowConfigAtom = atom(true);
 
 export const AnnotatedImagesAtom = atomWithStorage<AnnotatedImageType[]>("annotatedImages", []);
+
+// 添加标注状态原子
+export const IsAnnotatingAtom = atom<boolean>(false);
