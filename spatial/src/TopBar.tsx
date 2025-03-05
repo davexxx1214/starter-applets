@@ -36,23 +36,6 @@ export function TopBar() {
       <div className="flex gap-3 items-center">
       </div>
       <div className="flex gap-3 items-center">
-        {detectType === "2D bounding boxes" ? (
-          <div>
-            <label className="flex items-center gap-2 px-3 select-none whitespace-nowrap">
-              <input
-                type="checkbox"
-                checked={revealOnHover}
-                onChange={(e) => {
-                  if (e.target.checked) {
-                    setHoverEntered(false);
-                  }
-                  setRevealOnHoverMode(e.target.checked);
-                }}
-              />
-              <div>悬停显示</div>
-            </label>
-          </div>
-        ) : null}
       </div>
     </div>
   );

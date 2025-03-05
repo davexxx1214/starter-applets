@@ -23,6 +23,8 @@ import {
   DetectTypeAtom,
   BoundingBoxes2DAtom,
   AnnotatedImagesAtom,
+  RevealOnHoverModeAtom,
+  HoverEnteredAtom,
 } from "./atoms";
 import { ScreenshareButton } from "./ScreenshareButton";
 import { useResetState } from "./hooks";
@@ -38,6 +40,9 @@ export function SideControls() {
   const [isAnnotating, setIsAnnotating] = useAtom(IsAnnotatingAtom);
   const [, setBoundingBoxes2D] = useAtom(BoundingBoxes2DAtom);
   const [annotatedImages, setAnnotatedImages] = useAtom(AnnotatedImagesAtom);
+  const [revealOnHover, setRevealOnHoverMode] = useAtom(RevealOnHoverModeAtom);
+  const [, setHoverEntered] = useAtom(HoverEnteredAtom);
+  const [detectType] = useAtom(DetectTypeAtom);
   const resetState = useResetState();
 
   // 执行标注的函数
@@ -159,71 +164,90 @@ export function SideControls() {
 
   return (
     <div className="flex flex-col gap-3">
-      <label className={`flex items-center button bg-[#3B68FF] px-12 !text-white !border-none ${isAnnotating ? 'opacity-50 cursor-not-allowed' : ''}`}>
-        <input
-          className="hidden"
-          type="file"
-          accept=".jpg, .jpeg, .png, .webp"
-          disabled={isAnnotating}
-          onChange={(e) => {
-            const file = e.target.files?.[0];
-            if (file) {
-              console.log(`[上传图片] 开始处理文件: ${file.name}, 大小: ${(file.size / 1024).toFixed(2)}KB, 类型: ${file.type}`);
-              
-              // 先设置标注状态
-              setIsAnnotating(true);
-              console.log("[上传图片] 设置标注状态为进行中");
-              
-              const reader = new FileReader();
-              reader.onload = async (e) => {
-                try {
-                  console.log("[上传图片] 文件读取完成，准备处理图像数据");
-                  const imageDataUrl = e.target?.result as string;
-                  
-                  // 重置状态并设置新图像
-                  console.log("[上传图片] 重置应用状态");
-                  resetState();
-                  console.log("[上传图片] 设置图像源");
-                  setImageSrc(imageDataUrl);
-                  console.log("[上传图片] 标记为上传图像");
-                  setIsUploadedImage(true);
-                  console.log("[上传图片] 重置图像发送状态");
-                  setImageSent(false);
-                  console.log("[上传图片] 更新会话ID");
-                  setBumpSession((prev) => prev + 1);
-                  
-                  // 确保图像已加载
-                  console.log("[上传图片] 等待图像完全加载");
-                  const image = new Image();
-                  image.src = imageDataUrl;
-                  
-                  await new Promise((resolve) => {
-                    image.onload = resolve;
-                  });
-                  
-                  console.log("[上传图片] 图像加载完成，尺寸:", image.width, "x", image.height);
-                  console.log("[上传图片] 开始执行自动标注");
-                  
-                  // 直接使用读取到的图像数据进行标注
-                  await performAnnotation(imageDataUrl);
-                } catch (error) {
-                  console.error("[上传图片] 处理图像失败:", error);
+      <div className="flex gap-3 items-center">
+        <label className={`flex items-center button bg-[#3B68FF] px-12 !text-white !border-none ${isAnnotating ? 'opacity-50 cursor-not-allowed' : ''}`}>
+          <input
+            className="hidden"
+            type="file"
+            accept=".jpg, .jpeg, .png, .webp"
+            disabled={isAnnotating}
+            onChange={(e) => {
+              const file = e.target.files?.[0];
+              if (file) {
+                console.log(`[上传图片] 开始处理文件: ${file.name}, 大小: ${(file.size / 1024).toFixed(2)}KB, 类型: ${file.type}`);
+                
+                // 先设置标注状态
+                setIsAnnotating(true);
+                console.log("[上传图片] 设置标注状态为进行中");
+                
+                const reader = new FileReader();
+                reader.onload = async (e) => {
+                  try {
+                    console.log("[上传图片] 文件读取完成，准备处理图像数据");
+                    const imageDataUrl = e.target?.result as string;
+                    
+                    // 重置状态并设置新图像
+                    console.log("[上传图片] 重置应用状态");
+                    resetState();
+                    console.log("[上传图片] 设置图像源");
+                    setImageSrc(imageDataUrl);
+                    console.log("[上传图片] 标记为上传图像");
+                    setIsUploadedImage(true);
+                    console.log("[上传图片] 重置图像发送状态");
+                    setImageSent(false);
+                    console.log("[上传图片] 更新会话ID");
+                    setBumpSession((prev) => prev + 1);
+                    
+                    // 确保图像已加载
+                    console.log("[上传图片] 等待图像完全加载");
+                    const image = new Image();
+                    image.src = imageDataUrl;
+                    
+                    await new Promise((resolve) => {
+                      image.onload = resolve;
+                    });
+                    
+                    console.log("[上传图片] 图像加载完成，尺寸:", image.width, "x", image.height);
+                    console.log("[上传图片] 开始执行自动标注");
+                    
+                    // 直接使用读取到的图像数据进行标注
+                    await performAnnotation(imageDataUrl);
+                  } catch (error) {
+                    console.error("[上传图片] 处理图像失败:", error);
+                    setIsAnnotating(false);
+                  }
+                };
+                
+                reader.onerror = () => {
+                  console.error("[上传图片] 读取文件失败");
                   setIsAnnotating(false);
+                };
+                
+                console.log("[上传图片] 开始读取文件数据");
+                reader.readAsDataURL(file);
+              }
+            }}
+          />
+          <div>{isAnnotating ? "自动标注中..." : "上传图片"}</div>
+        </label>
+        
+        {detectType === "2D bounding boxes" && (
+          <label className="flex items-center gap-2 px-3 select-none whitespace-nowrap">
+            <input
+              type="checkbox"
+              checked={revealOnHover}
+              onChange={(e) => {
+                if (e.target.checked) {
+                  setHoverEntered(false);
                 }
-              };
-              
-              reader.onerror = () => {
-                console.error("[上传图片] 读取文件失败");
-                setIsAnnotating(false);
-              };
-              
-              console.log("[上传图片] 开始读取文件数据");
-              reader.readAsDataURL(file);
-            }
-          }}
-        />
-        <div>{isAnnotating ? "自动标注中..." : "上传图片"}</div>
-      </label>
+                setRevealOnHoverMode(e.target.checked);
+              }}
+            />
+            <div>鼠标悬停显示</div>
+          </label>
+        )}
+      </div>
+      
       <div className="hidden">
         <button
           className="button flex gap-3 justify-center items-center"
