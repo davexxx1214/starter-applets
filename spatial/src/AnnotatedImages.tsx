@@ -26,7 +26,7 @@ import {
 import { useResetState } from "./hooks";
 
 export function AnnotatedImages() {
-  const [annotatedImages] = useAtom(AnnotatedImagesAtom);
+  const [annotatedImages, setAnnotatedImages] = useAtom(AnnotatedImagesAtom);
   const [, setImageSrc] = useAtom(ImageSrcAtom);
   const [, setIsUploadedImage] = useAtom(IsUploadedImageAtom);
   const [, setDetectType] = useAtom(DetectTypeAtom);
@@ -34,6 +34,18 @@ export function AnnotatedImages() {
   const [, setBoundingBoxes3D] = useAtom(BoundingBoxes3DAtom);
   const [, setPoints] = useAtom(PointsAtom);
   const [, setImageSent] = useAtom(ImageSentAtom);
+  
+  // 删除图片的处理函数
+  const handleDeleteImage = (e: React.MouseEvent, imageId: string) => {
+    // 阻止事件冒泡，避免触发图片点击事件
+    e.stopPropagation();
+    
+    // 弹出确认对话框
+    if (window.confirm("确定要删除这张图片吗？")) {
+      // 用户确认后，从标注图片列表中删除指定图片
+      setAnnotatedImages((prev) => prev.filter((img) => img.id !== imageId));
+    }
+  };
 
   return (
     <div className="flex flex-col w-[250px] h-[500px] overflow-y-auto">
@@ -80,6 +92,17 @@ export function AnnotatedImages() {
               <div className="absolute bottom-0 left-0 right-0 bg-black bg-opacity-50 text-white text-xs p-1 truncate">
                 {new Date(image.timestamp).toLocaleString()}
               </div>
+              <button
+                className="absolute bottom-1 right-1 z-10 w-6 h-6 p-0 border-0 bg-transparent"
+                onClick={(e) => handleDeleteImage(e, image.id)}
+                title="删除图片"
+              >
+                <img 
+                  src="icons/trash.jpg" 
+                  alt="删除" 
+                  className="w-6 h-6"
+                />
+              </button>
             </button>
           ))}
         </div>
