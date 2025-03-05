@@ -43,15 +43,19 @@ function App() {
 
   return (
     <div className="flex flex-col h-[100dvh]">
-      <div className="flex grow flex-col border-b overflow-hidden">
-        <TopBar />
-        {initFinished ? <Content /> : null}
-        <ExtraModeControls />
-      </div>
-      <div className="flex shrink-0 w-full overflow-auto py-6 px-5 gap-6 lg:items-start">
-        <div className="flex flex-col lg:flex-col gap-6 items-start">
-          <AnnotatedImages />
-          <SideControls />
+      <div className="flex grow overflow-hidden">
+        <div className="w-1/5 border-r overflow-auto py-6 px-3">
+          <div className="flex flex-col gap-6 items-start">
+            <SideControls />
+            <AnnotatedImages />
+          </div>
+        </div>
+        <div className="w-3/5 flex flex-col">
+          <TopBar />
+          <div className="flex grow w-full">
+            {initFinished ? <Content /> : null}
+          </div>
+          <ExtraModeControls />
         </div>
       </div>
     </div>

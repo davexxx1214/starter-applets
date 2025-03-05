@@ -246,36 +246,54 @@ export function Content() {
   }, [boundingBoxes3D, boundingBoxContainer, fov]);
 
   function setHoveredBox(e: React.PointerEvent) {
-    const boxes = document.querySelectorAll(".bbox");
-    const dimensionsAndIndex = Array.from(boxes).map((box, i) => {
-      const { top, left, width, height } = box.getBoundingClientRect();
-      return {
-        top,
-        left,
-        width,
-        height,
-        index: i,
-      };
-    });
-    // Sort smallest to largest
-    const sorted = dimensionsAndIndex.sort(
-      (a, b) => a.width * a.height - b.width * b.height,
-    );
-    // Find the smallest box that contains the mouse
-    const { clientX, clientY } = e;
-    const found = sorted.find(({ top, left, width, height }) => {
-      return (
-        clientX > left &&
-        clientX < left + width &&
-        clientY > top &&
-        clientY < top + height
+    // 使用setTimeout确保DOM已更新
+    setTimeout(() => {
+      // 获取容器的位置和尺寸
+      const containerRect = boundingBoxContainerRef.current?.getBoundingClientRect();
+      if (!containerRect) return;
+      
+      // 获取所有边框框元素
+      const boxes = document.querySelectorAll(".bbox");
+      
+      if (boxes.length === 0) {
+        return;
+      }
+      
+      const dimensionsAndIndex = Array.from(boxes).map((box, i) => {
+        const { top, left, width, height } = box.getBoundingClientRect();
+        return {
+          top,
+          left,
+          width,
+          height,
+          index: i,
+        };
+      });
+      
+      // 按面积从小到大排序
+      const sorted = dimensionsAndIndex.sort(
+        (a, b) => a.width * a.height - b.width * b.height,
       );
-    });
-    if (found) {
-      _setHoveredBox(found.index);
-    } else {
-      _setHoveredBox(null);
-    }
+      
+      // 获取鼠标位置
+      const { clientX, clientY } = e;
+      
+      // 找到包含鼠标的最小边框框
+      const found = sorted.find(({ top, left, width, height }) => {
+        return (
+          clientX >= left &&
+          clientX <= left + width &&
+          clientY >= top &&
+          clientY <= top + height
+        );
+      });
+      
+      if (found) {
+        _setHoveredBox(found.index);
+      } else {
+        _setHoveredBox(null);
+      }
+    }, 50); // 使用适当的延迟时间
   }
 
   const downRef = useRef<Boolean>(false);
@@ -318,7 +336,10 @@ export function Content() {
         onPointerEnter={(e) => {
           if (revealOnHover && !drawMode) {
             setHoverEntered(true);
-            setHoveredBox(e);
+            // 延迟调用setHoveredBox，确保hoverEntered状态已更新
+            setTimeout(() => {
+              setHoveredBox(e);
+            }, 50);
           }
         }}
         onPointerMove={(e) => {
@@ -349,7 +370,7 @@ export function Content() {
         onPointerLeave={(e) => {
           if (revealOnHover && !drawMode) {
             setHoverEntered(false);
-            setHoveredBox(e);
+            _setHoveredBox(null); // 直接设置为null，不调用setHoveredBox
           }
         }}
         onPointerDown={(e) => {

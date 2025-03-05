@@ -40,11 +40,18 @@ textarea:focus {
   border-color: var(--border-color);
 }
 
+/* 修改悬停显示的行为 */
+.bbox {
+  opacity: 1; /* 默认显示所有边界框 */
+  z-index: 1;
+}
+
 .hide-box .bbox {
-  opacity: 0;
+  opacity: 0; /* 当容器有hide-box类时，隐藏所有边界框 */
   z-index: -1;
 }
+
 .hide-box .bbox.reveal {
-  opacity: 1;
-  z-index: 1;
+  opacity: 1; /* 当容器有hide-box类且边界框有reveal类时，显示该边界框 */
+  z-index: 2; /* 提高z-index，确保在其他边界框之上 */
 }

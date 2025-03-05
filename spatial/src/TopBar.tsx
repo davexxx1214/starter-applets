@@ -34,17 +34,6 @@ export function TopBar() {
   return (
     <div className="flex w-full items-center px-3 py-2 border-b justify-between">
       <div className="flex gap-3 items-center">
-        <button
-          onClick={() => {
-            resetState();
-          }}
-          className="p-0 border-none underline bg-transparent"
-          style={{
-            minHeight: "0",
-          }}
-        >
-          <div>Reset session</div>
-        </button>
       </div>
       <div className="flex gap-3 items-center">
         {detectType === "2D bounding boxes" ? (
@@ -60,26 +49,10 @@ export function TopBar() {
                   setRevealOnHoverMode(e.target.checked);
                 }}
               />
-              <div>reveal on hover</div>
+              <div>悬停显示</div>
             </label>
           </div>
         ) : null}
-        {showConfig && (<label className="flex gap-2 items-center">
-          <select
-            className="border bg-transparent py-1 px-1 focus:border-[#80BBFF] rounded-md"
-            value={modelSelected}
-            onChange={(e) => {
-              const value = e.target.value;
-              setModelSelected(value);
-            }}
-          >
-            {modelOptions.map((model) => (
-              <option key={model} value={model}>
-                {model}
-              </option>
-            ))}
-          </select>
-        </label>)}
       </div>
     </div>
   );
